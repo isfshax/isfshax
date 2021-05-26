@@ -104,7 +104,7 @@ error_open:
 u32 _main(void)
 {
     u32 vector = 0;
-    mem_initialize();
+    //mem_initialize();
     irq_initialize();
     crypto_read_otp();
     nand_initialize();
@@ -119,7 +119,7 @@ u32 _main(void)
 
     nand_deinitialize();
     irq_shutdown();
-    mem_shutdown();
+    //mem_shutdown();
 
     /* failed to load the payload from SD or NAND -> shutdown */
     if (!vector)
