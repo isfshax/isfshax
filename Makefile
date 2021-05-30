@@ -32,15 +32,17 @@ DATA		:=
 #---------------------------------------------------------------------------------
 ARCH		:=	-march=armv5te -mcpu=arm926ej-s -marm -mthumb-interwork -mbig-endian -mfloat-abi=soft
 
+DEFINES		:=	-DCAN_HAZ_IRQ -D_GNU_SOURCE
+
 CFLAGS		:=	-g -std=c11 -Wall -Wno-unused-function -O3 \
 			-fomit-frame-pointer -ffunction-sections \
 			$(ARCH)
 
-CFLAGS		+=	$(INCLUDE) -DCAN_HAZ_IRQ -D_GNU_SOURCE -fno-builtin-printf -Wno-nonnull
+CFLAGS		+=	$(INCLUDE) $(DEFINES) -fno-builtin-printf -Wno-nonnull
 
 CXXFLAGS	:=	$(CFLAGS) -fno-rtti -fno-exceptions
 
-ASFLAGS		:=	-g $(ARCH)
+ASFLAGS		:=	-g $(ARCH) $(DEFINES)
 LDFLAGS		 =	-n -nostartfiles -g --specs=../stage2/link.specs $(ARCH) -Wl,--gc-sections,-Map,$(TARGET).map \
 			-L$(DEVKITARM)/lib/gcc/arm-none-eabi/5.3.0/be -L$(DEVKITARM)/arm-none-eabi/lib/be
 
