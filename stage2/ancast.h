@@ -37,6 +37,7 @@ typedef struct {
     u32 ddr_init;
 } ios_header;
 
+void ancast_iop_clear(u8* buffer);
 u32 ancast_iop_load(u8* buffer, size_t size);
 
 #endif

@@ -23,6 +23,10 @@
 
 #include "ancast.h"
 
+void ancast_iop_clear(u8* buffer)
+{
+    memset(&buffer[0], 0, 0x200);
+}
 
 u32 ancast_iop_load(u8* buffer, size_t size)
 {

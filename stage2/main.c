@@ -40,6 +40,8 @@ u32 load_payload_sd(void)
     FIL file;
     u32 vector = 0;
 
+    ancast_iop_clear((u8*)ANCAST_ADDRESS_IOP);
+
     sdcard_init();
 
     res = f_mount(&fatfs, "0:", 1);
@@ -75,6 +77,8 @@ u32 load_payload_nand(void)
     size_t btr, br;
     int res;
     u32 vector = 0;
+
+    ancast_iop_clear((u8*)ANCAST_ADDRESS_IOP);
 
     res = isfs_init();
     if (res)
