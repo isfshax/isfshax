@@ -31,6 +31,8 @@
 #include "nand.h"
 #include "isfs/isfs.h"
 #include "ancast.h"
+#include "debug.h"
+#include "lolserial.h"
 
 u32 load_payload_sd(void)
 {
@@ -108,18 +110,32 @@ error_open:
 u32 _main(void)
 {
     u32 vector = 0;
+
+    lolserial_init();
+    DEBUG("isfshax start\n");
+
     //mem_initialize();
     irq_initialize();
     crypto_read_otp();
     nand_initialize();
 
     /* repair isfshax superblocks ecc errors, if present */
+    DEBUG("isfshax_refresh\n");
     isfshax_refresh();
 
     /* attempt to load the payload from SD, then NAND */
+    DEBUG("load_payload_sd\n");
+    lolserial_suspend();
     vector = load_payload_sd();
-    if (!vector)
+    lolserial_resume();
+
+    if (!vector) {
+        DEBUG("load_payload_nand\n");
+        lolserial_suspend();
         vector = load_payload_nand();
+        lolserial_resume();
+    }
+    DEBUG("vector: %08lX\n", vector);
 
     nand_deinitialize();
     irq_shutdown();

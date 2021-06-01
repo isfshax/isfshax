@@ -16,11 +16,12 @@
 #define __DEBUG_H__
 
 #include "types.h"
+#include "stdio.h"
 
-#ifndef LOLSERIAL_DEBUG
+#ifndef ENABLE_DEBUG
 static inline void DEBUG(char *fmt, ...) {}
 #else
-void DEBUG(char *fmt, ...);
+#define DEBUG(...) printf(__VA_ARGS__)
 #endif
 
 
