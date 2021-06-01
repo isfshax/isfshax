@@ -14,7 +14,6 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include <malloc.h>
 #include "debug.h"
 
 #include "isfs/isfs.h"
@@ -171,9 +170,6 @@ int isfs_write_super(isfs_ctx *ctx, void *super, int index)
 
 int isfs_find_super(isfs_ctx* ctx, u32 min_generation, u32 max_generation, u32 *generation, u32 *version)
 {
-    void* super = memalign(64, CLUSTER_SIZE);
-    if(!super) return -1;
-
     struct {
         int index;
         u32 generation;
@@ -184,13 +180,13 @@ int isfs_find_super(isfs_ctx* ctx, u32 min_generation, u32 max_generation, u32 *
     {
         u32 cluster = CLUSTER_COUNT - (ctx->super_count - i) * ISFSSUPER_CLUSTERS;
 
-        if(isfs_read_volume(ctx, cluster, 1, 0, NULL, super))
+        if(isfs_read_volume(ctx, cluster, 1, 0, NULL, ctx->clbuf))
             continue;
 
-        int cur_version = isfs_get_super_version(super);
+        int cur_version = isfs_get_super_version(ctx->clbuf);
         if(cur_version < 0) continue;
 
-        u32 cur_generation = isfs_get_super_generation(super);
+        u32 cur_generation = isfs_get_super_generation(ctx->clbuf);
         if((cur_generation < newest.generation) ||
            (cur_generation < min_generation) ||
            (cur_generation >= max_generation))
@@ -200,8 +196,6 @@ int isfs_find_super(isfs_ctx* ctx, u32 min_generation, u32 max_generation, u32 *
         newest.generation = cur_generation;
         newest.version = cur_version;
     }
-
-    free(super);
 
     if(newest.index == -1)
     {
@@ -248,4 +242,3 @@ int isfs_commit_super(isfs_ctx* ctx)
 
     return -1;
 }
-

@@ -84,7 +84,7 @@ u32 load_payload_nand(void)
     if (res)
         return vector;
 
-    res = isfs_open(&file, "slc:/isfshax.bin");
+    res = isfs_open(&file, "slc:/sys/isfshax.bin");
     if (res)
         goto error_open;
 

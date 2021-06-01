@@ -66,9 +66,9 @@
 #define BANK_FL_4           (0x00000004) /* set by bsp:fla for revisions after latte A2X */
 
 #if NAND_WRITE_ENABLED
-static u8 nand_status_buf[STATUS_BUF_SIZE] ALIGNED(256);
+static u8 nand_status_buf[STATUS_BUF_SIZE] ALIGNED(NAND_DATA_ALIGN);
 #endif
-static u8 nand_spare_buf[SPARE_BUF_SIZE] ALIGNED(256);
+static u8 nand_spare_buf[SPARE_BUF_SIZE] ALIGNED(NAND_DATA_ALIGN);
 
 static u32 nand_enabled_banks = BANK_SLC;
 
@@ -193,7 +193,7 @@ int nand_write_page(u32 pageno, void *data, void *spare)
     if (pageno > PAGE_COUNT) {
         return nand_error("invalid page number");
     }
-    if ((u32)data & 0x1f) {
+    if ((u32)data & (NAND_DATA_ALIGN - 1)) {
         return nand_error("unaligned page buffer");
     }
 
@@ -342,7 +342,7 @@ int nand_read_page(u32 pageno, void *data, void *spare)
     if (pageno > PAGE_COUNT) {
         return nand_error("invalid page number");
     }
-    if ((u32)data & 0x1f) {
+    if ((u32)data & (NAND_DATA_ALIGN - 1)) {
         return nand_error("unaligned page buffer");
     }
 

@@ -14,7 +14,6 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include <malloc.h>
 
 #include "nand.h"
 #include "isfs/isfs.h"
@@ -33,9 +32,6 @@ int isfs_init(void)
 
     ctx = isfs_get_volume(ISFSVOL_SLC);
     ctx->mounted = !isfs_load_super(ctx, 0, ISFSHAX_GENERATION_FIRST);
-
-    /*ctx = isfs_get_volume(ISFSVOL_SLCCMPT);
-    ctx->mounted = !isfs_load_super(ctx, 0, 0xffffffff);*/
 
     initialized = true;
     return 0;
@@ -146,20 +142,14 @@ int isfs_read(isfs_file* file, void* buffer, size_t size, size_t* bytes_read)
 
     size_t total = size;
 
-    void* cluster_buf = memalign(64, CLUSTER_SIZE);
-    if(!cluster_buf) return -3;
-
     while(size) {
         size_t pos = file->offset % CLUSTER_SIZE;
         size_t copy = CLUSTER_SIZE - pos;
         if(copy > size) copy = size;
 
-        if (isfs_read_volume(ctx, file->cluster, 1, ISFSVOL_FLAG_ENCRYPTED, NULL, cluster_buf) < 0)
-        {
-            free(cluster_buf);
+        if (isfs_read_volume(ctx, file->cluster, 1, ISFSVOL_FLAG_ENCRYPTED, NULL, ctx->clbuf) < 0)
             return -4;
-        }
-        memcpy(buffer, cluster_buf + pos, copy);
+        memcpy(buffer, ctx->clbuf + pos, copy);
 
         file->offset += copy;
         buffer += copy;
@@ -168,8 +158,6 @@ int isfs_read(isfs_file* file, void* buffer, size_t size, size_t* bytes_read)
         if((pos + copy) >= CLUSTER_SIZE)
             file->cluster = isfs_get_fat(ctx)[file->cluster];
     }
-
-    free(cluster_buf);
 
     *bytes_read = total;
     return 0;

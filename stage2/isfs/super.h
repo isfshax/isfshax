@@ -31,7 +31,7 @@ typedef struct isfs_super {
     u16 fat[CLUSTER_COUNT];
     isfs_fst fst[6143];
     u8 pad[20];
-} PACKED ALIGNED(64) isfs_super;
+} PACKED ALIGNED(NAND_DATA_ALIGN) isfs_super;
 _Static_assert(sizeof(isfs_super) == ISFSSUPER_SIZE, "isfs_super must be 0x40000");
 
 #define FAT_CLUSTER_LAST        0xFFFB // last cluster within a chain

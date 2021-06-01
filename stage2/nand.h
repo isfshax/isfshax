@@ -19,6 +19,8 @@
 
 #define NAND_WRITE_ENABLED  1
 
+#define NAND_DATA_ALIGN     128
+
 /* nand structure definitions */
 #define PAGE_SIZE           0x800
 #define PAGE_COUNT          0x40000

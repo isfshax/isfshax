@@ -23,6 +23,7 @@ typedef struct isfs_ctx {
     const u32 super_count;
     int index;
     u8* const super;
+    u8* const clbuf;
     u32 generation;
     u32 version;
     bool mounted;

@@ -8,10 +8,9 @@
 #include "hmac.h"
 #include "string.h"
 
-static u8 slc_super_buf[ISFSSUPER_SIZE];
-/*static u8 slccmpt_super_buf[ISFSSUPER_SIZE];*/
+static u8 slc_super_buf[ISFSSUPER_SIZE] ALIGNED(NAND_DATA_ALIGN), slc_cluster_buf[CLUSTER_SIZE] ALIGNED(NAND_DATA_ALIGN);
 
-isfs_ctx isfs[4] = {
+isfs_ctx isfs[] = {
     [ISFSVOL_SLC]
     {
         .volume = ISFSVOL_SLC,
@@ -21,22 +20,13 @@ isfs_ctx isfs[4] = {
         .hmac = &otp.nand_hmac,
         .super_count = 64,
         .super = slc_super_buf,
+        .clbuf = slc_cluster_buf,
     },
-    /*[ISFSVOL_SLCCMPT]
-    {
-        .volume = ISFSVOL_SLCCMPT,
-        .name = "slccmpt",
-        .bank = BANK_SLCCMPT,
-        .key = &otp.wii_nand_key,
-        .hmac = &otp.wii_nand_hmac,
-        .super_count = 16,
-        .super = slccmpt_super_buf,
-    },*/
 };
 
 int isfs_num_volumes(void)
 {
-    return sizeof(isfs) / sizeof(isfs_ctx);
+    return sizeof(isfs) / sizeof(*isfs);
 }
 
 isfs_ctx* isfs_get_volume(int volume)
@@ -155,8 +145,8 @@ int isfs_read_volume(const isfs_ctx* ctx, u32 start_cluster, u32 cluster_count, 
 
 int isfs_write_volume(const isfs_ctx* ctx, u32 start_cluster, u32 cluster_count, u32 flags, void *hmac_seed, void *data)
 {
-    static u8 blockpg[64][PAGE_SIZE] ALIGNED(64), blocksp[64][SPARE_SIZE];
-    static u8 pgbuf[PAGE_SIZE] ALIGNED(64), spbuf[SPARE_SIZE];
+    static u8 blockpg[64][PAGE_SIZE] ALIGNED(NAND_DATA_ALIGN), blocksp[64][SPARE_SIZE];
+    static u8 pgbuf[PAGE_SIZE] ALIGNED(NAND_DATA_ALIGN), spbuf[SPARE_SIZE];
     u8 hmac[20] = {0};
     int rc = ISFSVOL_OK;
     u32 b, p;
