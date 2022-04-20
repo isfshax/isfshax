@@ -9,6 +9,12 @@
 
 #define LOLSERIAL_WAIT_TICKS    200
 
+#if 1
+#define LOLSERIAL_PIN GP_SENSORBAR
+#else
+#define LOLSERIAL_PIN GP_DEBUG0
+#endif
+
 static int enable = 1;
 static char suspend_buf[4096];
 static int suspend_len = 0;
@@ -17,16 +23,16 @@ static int suspend_len = 0;
 static void lolserial_lprint(const char *str, int len)
 {
     /* setup output pin */
-    clear32(LT_GPIO_OWNER, GP_SENSORBAR);
-    set32(LT_GPIO_ENABLE, GP_SENSORBAR);
-    set32(LT_GPIO_DIR, GP_SENSORBAR);
-    set32(LT_GPIO_OUT, GP_SENSORBAR);
+    clear32(LT_GPIO_OWNER, LOLSERIAL_PIN);
+    set32(LT_GPIO_ENABLE, LOLSERIAL_PIN);
+    set32(LT_GPIO_DIR, LOLSERIAL_PIN);
+    set32(LT_GPIO_OUT, LOLSERIAL_PIN);
 
     /* loop until null terminator or string end */
     for (const char *end = str + len; *str && (str != end); str++) {
         for (u32 bits = 0x200 | (*str << 1); bits; bits >>= 1) {
             /* set bit value */
-            mask32(LT_GPIO_OUT, GP_SENSORBAR, (bits & 1) ? GP_SENSORBAR : 0);
+            mask32(LT_GPIO_OUT, LOLSERIAL_PIN, (bits & 1) ? LOLSERIAL_PIN : 0);
 
             /* wait ticks for bit */
             u32 now = read32(LT_TIMER), then = now + LOLSERIAL_WAIT_TICKS;
