@@ -1,0 +1,4 @@
+build
+*.bin
+*.img
+*.img.sha
