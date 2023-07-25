@@ -12,7 +12,7 @@ This repository contains the main isfshax exploit and stage2 payload loader.
 It will produce an (unencrypted) ISFS superblock image, meant to be installed through isfshax_installer or other means.  
 The stage2 payload will attempt to load (in order):
   - `sd:/isfshax.bin`
-  - `nand:/isfshax.bin`
+  - `slc:/sys/isfshax.bin`
 
 ### Status
 Right now I unfortunately do not have much time or motivation to work on the project, and it's been more than two years since I last actively contributed to it.  
