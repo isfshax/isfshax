@@ -2,3 +2,4 @@ build
 *.bin
 *.img
 *.img.sha
+.directory
