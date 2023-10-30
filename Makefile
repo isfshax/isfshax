@@ -18,43 +18,8 @@ GCC_VERSION := $(shell $(CC) -dumpversion)
 # INCLUDES is a list of directories containing header files
 # SPECS is the directory containing the important build and link files
 #---------------------------------------------------------------------------------
-export TARGET	:=	stage2
+export TARGET	:=	minute_minute
 export BUILD	?=	build
-
-R_SOURCES	:=
-SOURCES		:=	stage2 stage2/fatfs stage2/isfs
-
-R_INCLUDES	:=
-INCLUDES 	:=	stage2
-
-DATA		:=
-
-#---------------------------------------------------------------------------------
-# options for code generation
-#---------------------------------------------------------------------------------
-ARCH		:=	-march=armv5te -mcpu=arm926ej-s -marm -mthumb-interwork -mbig-endian -mfloat-abi=soft
-
-DEFINES		:=	-DCAN_HAZ_IRQ -D_GNU_SOURCE
-
-CFLAGS		:=	-g -std=c11 -Wall -Wno-unused-function -O3 \
-			-fomit-frame-pointer -ffunction-sections \
-			$(ARCH)
-
-CFLAGS		+=	$(INCLUDE) $(DEFINES) -fno-builtin-printf -Wno-nonnull
-
-CXXFLAGS	:=	$(CFLAGS) -fno-rtti -fno-exceptions
-
-ASFLAGS		:=	-g $(ARCH) $(DEFINES)
-LDFLAGS		 =	-n -nostartfiles -g --specs=../stage2/link.specs $(ARCH) -Wl,--gc-sections,-Map,$(TARGET).map \
-			-L$(DEVKITARM)/lib/gcc/arm-none-eabi/$(GCC_VERSION)/be -L$(DEVKITARM)/arm-none-eabi/lib/be
-
-LIBS		:=
-
-#---------------------------------------------------------------------------------
-# list of directories containing libraries, this must be the top level containing
-# include and lib
-#---------------------------------------------------------------------------------
-LIBDIRS		:=
 
 #---------------------------------------------------------------------------------
 # no real need to edit anything past this point unless you need to add additional
@@ -66,41 +31,11 @@ ifneq ($(BUILD),$(notdir $(CURDIR)))
 export ROOTDIR	:=	$(CURDIR)
 export OUTPUT	:=	$(CURDIR)/$(TARGET)
 
-SOURCES		:=	$(SOURCES) $(foreach dir,$(R_SOURCES), $(dir) $(filter %/, $(wildcard $(dir)/*/)))
-INCLUDES	:=	$(INCLUDES) $(foreach dir,$(R_INCLUDES), $(dir) $(filter %/, $(wildcard $(dir)/*/)))
-
 export VPATH	:=	$(foreach dir,$(SOURCES),$(CURDIR)/$(dir)) \
 			$(foreach dir,$(DATA),$(CURDIR)/$(dir))
 
 export DEPSDIR	:=	$(CURDIR)/$(BUILD)
 
-CFILES		:=	$(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)/*.c)))
-CPPFILES	:=	$(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)/*.cpp)))
-SFILES		:=	$(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)/*.S)))
-BINFILES	:=	$(foreach dir,$(DATA),$(notdir $(wildcard $(dir)/*.*)))
-
-#---------------------------------------------------------------------------------
-# use CXX for linking C++ projects, CC for standard C
-#---------------------------------------------------------------------------------
-ifeq ($(strip $(CPPFILES)),)
-#---------------------------------------------------------------------------------
-	export LD	:=	$(CC)
-#---------------------------------------------------------------------------------
-else
-#---------------------------------------------------------------------------------
-	export LD	:=	$(CXX)
-#---------------------------------------------------------------------------------
-endif
-#---------------------------------------------------------------------------------
-
-export OFILES	:=	$(addsuffix .o,$(BINFILES)) \
-			$(CPPFILES:.cpp=.o) $(CFILES:.c=.o) $(SFILES:.S=.o)
-
-export INCLUDE	:=	$(foreach dir,$(INCLUDES),-I$(CURDIR)/$(dir)) \
-			$(foreach dir,$(LIBDIRS),-I$(dir)/include) \
-			-I$(CURDIR)/$(BUILD)
-
-export LIBPATHS	:=	$(foreach dir,$(LIBDIRS),-L$(dir)/lib)
 
 .PHONY: $(BUILD) clean all
 
@@ -114,6 +49,7 @@ $(BUILD):
 #---------------------------------------------------------------------------------
 clean:
 	@echo clean ...
+	@$(MAKE) -C $(ROOTDIR)/$(TARGET) -f Makefile.isfshax clean
 	@$(MAKE) -C $(ROOTDIR)/stage2ldr clean
 	@rm -fr $(BUILD) $(OUTPUT).elf $(OUTPUT)-strip.elf $(OUTPUT).bin
 	@rm -fr $(ROOTDIR)/superblock.img $(ROOTDIR)/superblock.img.sha
@@ -128,25 +64,21 @@ DEPENDS		:=	$(OFILES:.o=.d)
 # main targets
 #---------------------------------------------------------------------------------
 ELFLOADER = $(ROOTDIR)/stage2ldr/stage2ldr.bin
+BOOT1 = $(ROOTDIR)/$(TARGET)/isfshax_stage2-strip.elf
 
 $(ROOTDIR)/superblock.img: $(OUTPUT).bin
 	@echo $(notdir $@)
 	@python3 $(ROOTDIR)/isfshax.py $< $@
 
-$(OUTPUT).bin: $(TARGET)-strip.elf $(ELFLOADER)
+$(OUTPUT).bin: $(BOOT1) $(ELFLOADER)
 	@echo $(notdir $@)
 	@cat $(ELFLOADER) $< > $@
 
-$(TARGET)-strip.elf: $(TARGET).elf
-	@echo $(notdir $@)
-	@$(STRIP) $< -o $@
-
-$(TARGET).elf: $(OFILES)
-	$(SILENTMSG) linking $(notdir $@)
-	$(SILENTCMD)$(LD)  $(LDFLAGS) $(OFILES) $(LIBPATHS) $(LIBS) -o $@
-
 $(ELFLOADER):
 	@$(MAKE) -C $(ROOTDIR)/stage2ldr
+
+$(BOOT1):
+	@$(MAKE) -C $(ROOTDIR)/$(TARGET) -f Makefile.isfshax
 
 
 -include $(DEPENDS)
