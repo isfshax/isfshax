@@ -1,4 +1,4 @@
 [submodule "minute_minute"]
 	path = minute_minute
-	url = https://github.com/jan-hofmeier/minute_minute.git
+	url = git@github.com:jan-hofmeier/minute_minute.git
 	branch = autoboot
