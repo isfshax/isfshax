@@ -43,7 +43,7 @@ Huge thanks to:
   destroyed during early isfshax testing
 - Maschell for his help and all other contributions to the Wii U scene
 - hexkyz for the warmboot boot1 exploit which made all of this possible
-- shinyquagsire123 for de_Fuse
+- shinyquagsire123 for de_Fuse and minute
 - Salt Team for the original minute CFW
 - dimok789, FIX94 and others for the iosuhax CFW
 - fail0verflow for mini
