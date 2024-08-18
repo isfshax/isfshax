@@ -2,6 +2,8 @@
 Ensure you have an SLC backup at hand and a safe way to restore it before proceeding.  
 Thanks to shinyquagsire123's de_Fuse vulnerability it should now be possible to restore SLC without the need for an SLC hardmod, which should make repairs at least somewhat less troublesome.
 
+You find a full guide for setting it up here: [How to set up ISFShax on GBAtemp.net](https://gbatemp.net/threads/how-to-set-up-isfshax.642258/)
+
 # isfshax
 
 isfshax is a coldboot boot1 exploit for the Wii U.  
