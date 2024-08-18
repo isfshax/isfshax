@@ -9,8 +9,12 @@ This repository contains the main isfshax exploit and stage2loader. It will use 
 It will produce an (unencrypted) ISFS superblock image, meant to be installed through isfshax_installer.  
 The minute_minute stage2 payload will attempt to load (in order):
 
-- `slc:/sys/hax/fw.img`
-- `sd:/fw.img` (5 times)
+- SD (5 times)
+  - `sd:/minute.img`
+  - `sd:/fw.img`
+- SLC
+  - `slc:/sys/hax/minute.img`
+  - `slc:/sys/hax/fw.img`
 - `slc:/sys/title/00050010/1000400a/code/fw.img` + patches
 
 The first two locations are supposed to hold the full [minute](https://github.com/jan-hofmeier/minute_minute/). The third location is the OSv10 IOSU as a fallback. A minimal set of paches will be applied to the IOSU to make it boot with ISFShax and mitigate side effects of ISFShax and to block system updates.
