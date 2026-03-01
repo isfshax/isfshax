@@ -31,12 +31,12 @@ These are the files that it attemots to load for each location:
   - `slc:/sys/hax/fw.img`
 - Fallback
   - `slc:/sys/title/00050010/1000400a/code/fw.img` + patches
+
+The first two locations are supposed to hold the full [minute](https://github.com/jan-hofmeier/minute_minute/). The third location is the OSv10 IOSU as a fallback. A minimal set of paches will be applied to the IOSU to make it boot with ISFShax and mitigate side effects of ISFShax and to block system updates.
  
 **Fallback mode can be triggered by Taping Power (to turn on), release Power and then hold power again for 3 seconds**
 
-The first two locations are supposed to hold the full [minute](https://github.com/jan-hofmeier/minute_minute/). The third location is the OSv10 IOSU as a fallback. A minimal set of paches will be applied to the IOSU to make it boot with ISFShax and mitigate side effects of ISFShax and to block system updates.
-
-In case a broken fw.img gets installed to the slc, the SLC load can be skipped completely by spamming the power buttion. In that case only the SD will be tried and it will be retried indefinitely. 
+In case a broken fw.img gets installed to the slc, you can put a good one on the SD or use fallback mode to load without minute the IOSU directly.
 
 When using minute with [stroopwafel](https://github.com/jan-hofmeier/stroopwafel) the [wafel_isfshax_patch](https://github.com/isfshax/wafel_isfshax_patch) is required or else IOSU would crash because of ISFShax.
 
