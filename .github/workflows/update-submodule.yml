@@ -23,6 +23,7 @@ jobs:
 
       - name: Update minute_minute submodule
         run: |
+          git config --global url."https://github.com/".insteadOf "git@github.com:"
           git submodule update --init minute_minute
           git submodule update --remote minute_minute
 
