@@ -23,9 +23,11 @@ jobs:
 
       - name: Update minute_minute submodule
         run: |
-          git config --global url."https://github.com/".insteadOf "git@github.com:"
-          git submodule update --init minute_minute
-          git submodule update --remote minute_minute
+          # Force HTTPS for the submodule to avoid SSH key issues in CI
+          sed -i 's|git@github.com:|https://github.com/|g' .gitmodules
+          git submodule sync
+          git submodule update --init --recursive minute_minute
+          git submodule update --remote --recursive minute_minute
 
       - name: Commit and push changes
         run: |
