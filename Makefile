@@ -74,12 +74,13 @@ $(OUTPUT).bin: $(BOOT1) $(ELFLOADER)
 	@echo $(notdir $@)
 	@cat $(ELFLOADER) $< > $@
 
-$(ELFLOADER):
+$(ELFLOADER): FORCE
 	@$(MAKE) -C $(ROOTDIR)/stage2ldr
 
-$(BOOT1):
+$(BOOT1): FORCE
 	@$(MAKE) -C $(ROOTDIR)/$(TARGET) -f Makefile.isfshax
 
+FORCE:
 
 -include $(DEPENDS)
 

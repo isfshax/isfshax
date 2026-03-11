@@ -10,7 +10,7 @@ STRIP   = $(PREFIX)-strip
 OBJCOPY = $(PREFIX)-objcopy
 
 ASFLAGS   = -marm -fomit-frame-pointer -mbig-endian -fshort-wchar -mcpu=arm926ej-s -march=armv5te -fno-zero-initialized-in-bss
-CFLAGS   = -Os -Wall -fpic $(ASFLAGS)
+CFLAGS   = -Os -Wall -fpic $(ASFLAGS) -MMD -MP
 LDFLAGS = -n -nostartfiles -Wl,-EB -L"$(DEVKITARM)/arm-none-eabi/lib"
 
 all: stage2ldr.bin
@@ -25,12 +25,14 @@ stage2ldr.elf: $(OBJS)
 
 %.o: %.c
 	@echo $(notdir $<)
-	@$(CC) $(CFLAGS) -c $^ -o $@
+	@$(CC) $(CFLAGS) -c $< -o $@
 
 %.o: %.S
 	@echo $(notdir $<)
-	@$(CC) $(ASFLAGS) -c $^ -o $@
+	@$(CC) $(ASFLAGS) -c $< -o $@
+
+-include $(OBJS:.o=.d)
 
 clean:
-	@rm -rf $(OBJS) stage2ldr.elf stage2ldr.bin
+	@rm -rf $(OBJS) $(OBJS:.o=.d) stage2ldr.elf stage2ldr.bin
 	@echo "Cleaned!"
