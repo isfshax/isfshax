@@ -1,0 +1,68 @@
+name: CI-Release
+
+on:
+  push:
+    branches:
+      - main
+      - master
+    tags:
+      - 'v*'
+  pull_request:
+    branches:
+      - main
+      - master
+
+permissions:
+  contents: write
+
+jobs:
+  build-binary:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        submodules: recursive
+    
+    - name: build binary
+      run: |
+        docker build . -t builder
+        docker run --rm -v ${PWD}:/project builder /bin/bash -c "make clean && make"
+        
+    - uses: actions/upload-artifact@v4
+      with:
+       name: isfshax-artifacts
+       path: |
+         *.img
+         *.bin
+         minute_minute/*.elf
+         minute_minute/*.map
+         stage2ldr/*.bin
+         stage2ldr/*.elf
+
+  deploy-binary:
+    needs: build-binary
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/tags/v'))
+    runs-on: ubuntu-latest
+    steps:   
+    - name: Get environment variables
+      id: get_repository_name
+      run: |
+        echo "REPOSITORY_NAME=$(echo "$GITHUB_REPOSITORY" | awk -F / '{print $2}' | sed -e "s/:refs//")" >> $GITHUB_ENV
+        echo "DATETIME=$(date '+%Y%m%d-%H%M%S')" >> $GITHUB_ENV 
+    
+    - uses: actions/download-artifact@v4
+      with:
+        name: isfshax-artifacts
+        path: artifacts
+
+    - name: Create Release
+      uses: "softprops/action-gh-release@v2"
+      with:
+        tag_name: ${{ env.REPOSITORY_NAME }}-${{ env.DATETIME }}
+        draft: true
+        prerelease: true
+        generate_release_notes: true
+        name: Nightly-${{ env.REPOSITORY_NAME }}-${{ env.DATETIME }}
+        files: |
+          artifacts/superblock.img
+          artifacts/minute_minute.bin
