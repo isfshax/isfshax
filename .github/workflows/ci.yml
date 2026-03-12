@@ -23,10 +23,21 @@ jobs:
       with:
         submodules: recursive
     
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
+    - name: Build Docker image
+      uses: docker/build-push-action@v6
+      with:
+        context: .
+        load: true
+        tags: builder:latest
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+    
     - name: build binary
       run: |
-        docker build . -t builder
-        docker run --rm -v ${PWD}:/project builder /bin/bash -c "make clean && make"
+        docker run --rm -v ${PWD}:/project builder:latest /bin/bash -c "make clean && make"
         
     - uses: actions/upload-artifact@v4
       with:
