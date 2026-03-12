@@ -33,6 +33,7 @@ jobs:
        name: isfshax-artifacts
        path: |
          *.img
+         *.img.sha
          *.bin
          minute_minute/*.elf
          minute_minute/*.map
@@ -65,4 +66,4 @@ jobs:
         name: Nightly-${{ env.REPOSITORY_NAME }}-${{ env.DATETIME }}
         files: |
           artifacts/superblock.img
-          artifacts/minute_minute.bin
+          artifacts/superblock.img.sha
