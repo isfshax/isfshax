@@ -16,10 +16,13 @@ The minute_minute stage2 payload will attempt to load:
   - SLC once
   - Falback
   - SD (forever)
-- Fallback Mode
+- Fallback Mode (Power)
   - SD (5 times)(at lower clock)
   - Fallback
-  - SD (forever)(at lower clock)    
+  - SD (forever)(at lower clock)
+- Fallback Mode 2 (Eject)
+  - Fallback
+  - SD (forever)(at lower clock)
 
 These are the files that it attemots to load for each location:
 
@@ -33,8 +36,10 @@ These are the files that it attemots to load for each location:
   - `slc:/sys/title/00050010/1000400a/code/fw.img` + patches
 
 The first two locations are supposed to hold the full [minute](https://github.com/jan-hofmeier/minute_minute/). The third location is the OSv10 IOSU as a fallback. A minimal set of paches will be applied to the IOSU to make it boot with ISFShax and mitigate side effects of ISFShax and to block system updates.
- 
+
 **Fallback mode can be triggered by Taping Power (to turn on), release Power and then hold power again for 3 seconds**
+
+**Fallback mode 2 can be triggered by Taping Power (to turn on), release Power and then hold Eject for 3 seconds**
 
 In case a broken fw.img gets installed to the slc, you can put a good one on the SD or use fallback mode to load without minute the IOSU directly.
 
